@@ -10,24 +10,11 @@ char gaten[7][7];
 #include "BordKengetal.h"
 #include "Spelen.h"
 #include "DynProgrammeren.h"
-
-//deze worden Interface.h
-
-void printBord(){
-  for( int y = 0; y < 7; ++y ){  
-    for( int x = 0; x < 7; ++x ){
-      cout << gaten[x][y];
-    }
-    cout << "\n";
-  }
-}
-
-
+#include "Interface.h"
 
 int main(){
   
-  cout << endl << "Speel door bijvoorbeeld \"3 1 onder\" [enter] in te toetsen. Dat is ook een geldige eerste zet." << endl;
-  cout << "Richtingen heten boven, rechts, onder, links" << endl << endl;
+  beginInstructies();
 
   beginSituatie();
   
@@ -37,14 +24,7 @@ int main(){
   richting echteRichting;
   
   while( !cin.eof() ){
-    printBord();
-    cout << "Kengetal: " << encodeerBord() << endl;
-    cout << "Mogelijke zetten: " << endl;
-    
-    list<tuple<int,int,richting>> mogelijkheden = alleMogelijkeZetten();
-    for( mogelijkeZet it = mogelijkheden.begin(); it != mogelijkheden.end(); ++it ){
-      cout << get<0>(*it) << " " << get<1>(*it) << endl;
-    }
+    toonSituatie();
 
     cin >> xInvoer;
     cin >> yInvoer;
