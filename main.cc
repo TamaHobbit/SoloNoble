@@ -70,14 +70,35 @@ void doeZet(int x, int y, richting springKant){
   }
 }
 
+void zetTerug(int x, int y, richting springKant){
+  gaten[x][y] = knikker;
+  switch( springKant ){
+    case boven:
+      gaten[x][y-1] = knikker;
+      gaten[x][y-2] = open;
+      return;
+    case rechts:
+      gaten[x+1][y] = knikker;
+      gaten[x+2][y] = open;
+      return;
+    case onder:
+      gaten[x][y+1] = knikker;
+      gaten[x][y+2] = open;
+      return;
+    case links:
+      gaten[x-1][y] = knikker;
+      gaten[x-2][y] = open;
+      return;
+  }
+}
+
 int main(){
   
-  cout << endl << "Speel door bijvoorbeeld \"3 2 onder\" [enter] in te toetsen" << endl;
+  cout << endl << "Speel door bijvoorbeeld \"3 1 onder\" [enter] in te toetsen. Dat is ook een geldige eerste zet." << endl;
   cout << "Richtingen heten boven, rechts, onder, links" << endl << endl;
 
   beginSituatie();
-  cout << BordKengetal::encodeerBord() << endl;
-
+  
   //de invoer variabelen
   int xInvoer, yInvoer;
   string richtingInvoer;
@@ -85,7 +106,7 @@ int main(){
   
   while( !cin.eof() ){
     printBord();
-
+    cout << "Kengetal: " << BordKengetal::encodeerBord() << endl;
     cin >> xInvoer;
     cin >> yInvoer;
     cin >> richtingInvoer;

@@ -1,4 +1,4 @@
-
+#include <algorithm>
 
 typedef unsigned long long eightBite;
 
@@ -22,6 +22,7 @@ public:
         bedacht |= (gaten[x][y] == knikker);
         bedacht <<= 1;
       }
+      // deze bit is altijd 0 (1 per 8-tal)
       bedacht <<= 1;
     }
     
@@ -65,8 +66,33 @@ public:
         bedacht <<= 1;
       }
     }
-
+    
+    bedacht = kleinsteEquivalente( bedacht );
     return BordKengetal(bedacht);
+  }
+
+  static eightBite draai90( eightBite invoer ){
+    return (invoer << 16) | (invoer >> (64-16));
+  }
+
+  static eightBite flip( eightBite invoer ){
+    return 0;// todo
+  }
+
+  // 3 1 onder, 1 3 rechts, 5 3 links en 3 5 boven
+  // hebben deze kengetallen, maar alleen de eerste wordt nu gebruikt
+  //11429853275466170110
+  //18374403900871450270
+  //18374297935438348030
+  //18374403899254570750
+  static eightBite kleinsteEquivalente( eightBite invoer ){
+    eightBite gedraaid[4];
+    for(int i = 0; i < 4; ++i){
+      gedraaid[i] = invoer;
+      invoer = draai90( invoer );
+    }
+    sort( gedraaid, gedraaid + 4 );
+    return gedraaid[0];
   }
 
   friend ostream& operator<<( ostream& links, const BordKengetal & rechts ){
