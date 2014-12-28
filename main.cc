@@ -23,7 +23,7 @@ int main(){
   string richtingInvoer;
   richting echteRichting;
   
-  while( !cin.eof() ){
+  while( !cin.eof() && !gewonnen() ){
     toonSituatie();
 
     cin >> xInvoer;
@@ -48,5 +48,8 @@ int main(){
       cout << endl << "Dat kan niet." << endl;
     }
   }
+  //todo ook stoppen als er geen zetten meer mogelijk zijn, 
+  //zodat je niet het programma hoeft te force quitten
+  cout << "Je hebt gewonnen!" << endl; 
   return 0;
 }

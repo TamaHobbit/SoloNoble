@@ -37,8 +37,23 @@ bool stellingTeRedden(){
   bordKengetal huidigeOpstelling = encodeerBord();
   stellingsInformatie alBekend = alleKennis.find ( huidigeOpstelling );
   if( alBekend != alleKennis.end() ){ //gevonden in de map, dus al geweest
-    return alBekend->second;
+    bool resultaat = alBekend->second;
+    alleKennis[huidigeOpstelling] = resultaat;
+    return resultaat;
   } else {
-    return false; //todo
+    list<tuple<int,int,richting>> mogelijkheden = alleMogelijkeZetten();
+    if( mogelijkheden.empty() ){
+      bool resultaat = gewonnen();
+      alleKennis[huidigeOpstelling] = resultaat;
+      return resultaat;
+    } else {
+      for( mogelijkeZet it = mogelijkheden.begin(); it != mogelijkheden.end(); ++it ){
+        doeZet( get<0>(*it), get<1>(*it), get<2>(*it) );
+        bool resultaat = stellingTeRedden();
+        alleKennis[huidigeOpstelling] = resultaat;
+        zetTerug( get<0>(*it), get<1>(*it), get<2>(*it) );
+        return resultaat;
+      }
+    }
   }
 }

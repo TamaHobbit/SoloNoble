@@ -71,3 +71,14 @@ void zetTerug(int x, int y, richting springKant){
       return;
   }
 }
+
+bool gewonnen(){
+  for( int y = 0; y < 7; ++y ){  
+    for( int x = 0; x < 7; ++x ){
+      if( (x == 3 && y == 3) != (gaten[x][y] == knikker) ){
+        return false;
+      }
+    }
+  }
+  return true;
+}
