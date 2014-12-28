@@ -7,6 +7,8 @@ const char bestaatNiet = ' ';
 
 char gaten[7][7];
 
+#include "BordKengetal.h"
+
 void printBord(){
   for( int y = 0; y < 7; ++y ){  
     for( int x = 0; x < 7; ++x ){
@@ -69,10 +71,13 @@ void doeZet(int x, int y, richting springKant){
 }
 
 int main(){
+
+  
   cout << endl << "Speel door bijvoorbeeld \"3 2 onder\" [enter] in te toetsen" << endl;
   cout << "Richtingen heten boven, rechts, onder, links" << endl << endl;
 
   beginSituatie();
+  cout << BordKengetal::encodeerBord() << endl;
 
   //de invoer variabelen
   int xInvoer, yInvoer;
