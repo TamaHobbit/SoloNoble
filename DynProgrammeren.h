@@ -21,10 +21,10 @@ list<tuple<int,int,richting>> alleMogelijkeZetten(){
         if( y > 1 && gaten[x][y-1] == knikker && gaten[x][y-2] == knikker ){
           gevondenZetten.push_front( make_tuple( x, y-2, onder ) );
         }
-        if( x < 6 && gaten[x+1][y] == knikker && gaten[x+2][y] == knikker ){
+        if( x < 5 && gaten[x+1][y] == knikker && gaten[x+2][y] == knikker ){
           gevondenZetten.push_front( make_tuple( x+2, y, links ) );
         }
-        if( y < 6 && gaten[x][y+1] == knikker && gaten[x][y+2] == knikker ){
+        if( y < 5 && gaten[x][y+1] == knikker && gaten[x][y+2] == knikker ){
           gevondenZetten.push_front( make_tuple( x, y+2, boven ) );
         }
         if( x > 1 && gaten[x-1][y] == knikker && gaten[x-2][y] == knikker ){
@@ -40,8 +40,8 @@ bool stellingTeRedden(){
 
   // Diagnostic counter
   static int count = 0 ;
-  if( ++count%1000==0 ){
-    cout << "." ;
+  if( ++count%100000==0 ){
+    cout << ".";
   }
 
   bordKengetal huidigeOpstelling = encodeerBord();

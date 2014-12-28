@@ -20,9 +20,9 @@ bool zetKan(int x, int y, richting springKant){
     case boven:
       return y > 1 && gaten[x][y-1] == knikker && gaten[x][y-2] == open;
     case rechts:
-      return x < 6 && gaten[x+1][y] == knikker && gaten[x+2][y] == open;
+      return x < 5 && gaten[x+1][y] == knikker && gaten[x+2][y] == open;
     case onder:
-      return y < 6 && gaten[x][y+1] == knikker && gaten[x][y+2] == open;
+      return y < 5 && gaten[x][y+1] == knikker && gaten[x][y+2] == open;
     case links:
       return x > 1 && gaten[x-1][y] == knikker && gaten[x-2][y] == open;
   }

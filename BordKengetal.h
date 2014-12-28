@@ -1,6 +1,6 @@
 #include <algorithm>
 
-typedef uint_64 bordKengetal;
+typedef unsigned long long bordKengetal;
 
   bordKengetal draai90( bordKengetal invoer ){
     return (invoer << 16) | (invoer >> (64-16));

@@ -24,6 +24,7 @@ int main(){
     stellingTeRedden();
     
   } catch( bool antwoord ){
+    cout << endl;
     while (!huidigePad.empty()){
       toonZet( huidigePad.top() );
       huidigePad.pop();
