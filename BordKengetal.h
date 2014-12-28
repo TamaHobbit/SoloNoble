@@ -24,7 +24,7 @@ public:
       }
       bedacht <<= 1;
     }
-    /*
+    
     // octant rechtsboven en -onder
     for( int y = 2; y <= 4; y += 2 ){ //boven, dan onder
       for( int x = 3; x <= 6; ++x ){
@@ -61,9 +61,11 @@ public:
         bedacht |= (gaten[x][y] == knikker);
         bedacht <<= 1;
       }
-      //niet meer opschuiven!
+      if( y == 4 ){ //laatste niet meer opschuiven!
+        bedacht <<= 1;
+      }
     }
-*/
+
     return BordKengetal(bedacht);
   }
 

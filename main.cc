@@ -71,7 +71,6 @@ void doeZet(int x, int y, richting springKant){
 }
 
 int main(){
-
   
   cout << endl << "Speel door bijvoorbeeld \"3 2 onder\" [enter] in te toetsen" << endl;
   cout << "Richtingen heten boven, rechts, onder, links" << endl << endl;
