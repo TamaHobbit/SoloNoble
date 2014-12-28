@@ -12,8 +12,6 @@ char gaten[7][7];
 #include "DynProgrammeren.h"
 #include "Interface.h"
 
-
-
 int main(){
   
   beginInstructies();
@@ -21,14 +19,18 @@ int main(){
   beginSituatie();
   
   //SpelerMagSpelen();
-  if( stellingTeRedden() ){
+
+  try {
+    stellingTeRedden();
+    
+  } catch( bool antwoord ){
     while (!huidigePad.empty()){
       toonZet( huidigePad.top() );
       huidigePad.pop();
     }
-  } else {
-    cout << "Dit spel is onmogelijk te winnen." << endl;
+    return 0;
   }
   
+  cout << "Dit spel is onmogelijk te winnen." << endl;
   return 0;
 }
