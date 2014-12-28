@@ -1,3 +1,3 @@
 all:
-	g++ -std=c++11 main.cc -Wfatal-errors -o knikkers
+	g++ -g -std=c++11 main.cc -Wfatal-errors -o knikkers
 

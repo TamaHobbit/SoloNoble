@@ -2,6 +2,7 @@
 #include <unordered_map>
 #include <list>
 #include <tuple>
+#include <stack>
 
 typedef unordered_map<bordKengetal,bool> hashTabel;
 typedef unordered_map<bordKengetal,bool>::iterator stellingsInformatie;
@@ -9,6 +10,8 @@ typedef unordered_map<bordKengetal,bool>::iterator stellingsInformatie;
 hashTabel alleKennis;
 
 typedef list<tuple<int,int,richting>>::iterator mogelijkeZet;
+
+stack<tuple<int,int,richting>> huidigePad;
 
 list<tuple<int,int,richting>> alleMogelijkeZetten(){
   list<tuple<int,int,richting>> gevondenZetten;
@@ -49,11 +52,17 @@ bool stellingTeRedden(){
     } else {
       for( mogelijkeZet it = mogelijkheden.begin(); it != mogelijkheden.end(); ++it ){
         doeZet( get<0>(*it), get<1>(*it), get<2>(*it) );
+        huidigePad.push( *it );
+
         bool resultaat = stellingTeRedden();
         alleKennis[huidigeOpstelling] = resultaat;
+
         zetTerug( get<0>(*it), get<1>(*it), get<2>(*it) );
+        huidigePad.pop();
+
         return resultaat;
       }
     }
   }
 }
+
