@@ -33,10 +33,18 @@ void toonSituatie(){
   cout << endl << "Kengetal: " << encodeerBord() << endl;
   cout << "Mogelijke zetten: " << endl;
     
-  list<tuple<int,int,richting>> mogelijkheden = alleMogelijkeZetten();
-  for( mogelijkeZet it = mogelijkheden.begin(); it != mogelijkheden.end(); ++it ){
-    toonZet( *it );
-  }
+  doeVoorMogelijkeZetten([](int x, int y, richting r){
+    cout << x << " " << y;
+    if( r == boven ){
+      cout << " boven" << endl;
+    } else if( r == rechts ){
+      cout << " rechts" << endl;
+    } else if( r == onder ){
+      cout << " onder" << endl;
+    } else if( r == links ){
+      cout << " links" << endl;
+    }
+  });
   cout << "======Uw zet:======" << endl;
 }
 
