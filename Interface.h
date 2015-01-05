@@ -26,6 +26,7 @@ void toonZet(tuple<int,int,richting> zet){
   }
 }
 
+// toon het bord met daaronder alle mogelijke zetten
 void toonSituatie(){
   cout << "-------" << endl;
   printBord();
@@ -48,7 +49,10 @@ void toonSituatie(){
   cout << "======Uw zet:======" << endl;
 }
 
+// geef instructies, en toon dan steeds het bord en accepteer zetten van de speler
 void SpelerMagSpelen(){
+  beginInstructies();
+
   //de invoer variabelen
   int xInvoer, yInvoer;
   string richtingInvoer;
@@ -82,4 +86,19 @@ void SpelerMagSpelen(){
   //todo ook stoppen als er geen zetten meer mogelijk zijn, 
   //zodat je niet het programma hoeft te force quitten
   cout << "Je hebt gewonnen!" << endl; 
+}
+
+// toon de nodige zetten om te winnen of "onmogelijk"
+void LosMaarOp(){
+  try {
+    stellingTeRedden();
+  } catch( bool antwoord ){
+    cout << "NB: antwoord is achterstevoren; bovenaan staat de laatste zet." << endl;
+    while (!huidigePad.empty()){
+      toonZet( huidigePad.top() );
+      huidigePad.pop();
+    }
+    return;
+  }
+  cout << "Dit spel is onmogelijk te winnen." << endl;
 }

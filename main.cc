@@ -13,25 +13,12 @@ char gaten[7][7];
 #include "Interface.h"
 
 int main(){
-  
-  beginInstructies();
 
   beginSituatie();
   
   //SpelerMagSpelen();
 
-  try {
-    stellingTeRedden();
-    
-  } catch( bool antwoord ){
-    cout << endl;
-    while (!huidigePad.empty()){
-      toonZet( huidigePad.top() );
-      huidigePad.pop();
-    }
-    return 0;
-  }
+  LosMaarOp();
   
-  cout << "Dit spel is onmogelijk te winnen." << endl;
   return 0;
 }
