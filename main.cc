@@ -11,6 +11,7 @@ char gaten[7][7];
 #include "Spelen.h"
 #include "DynProgrammeren.h"
 #include "Interface.h"
+#include "SDLscherm.h"
 
 int main(){
 
@@ -18,7 +19,9 @@ int main(){
   
   //SpelerMagSpelen();
 
-  LosMaarOp();
+  //LosMaarOp();
+
+  runSDL();
   
   return 0;
 }
