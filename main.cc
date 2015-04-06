@@ -21,7 +21,8 @@ int main(){
 
   //LosMaarOp();
 
-  runSDL();
+  SDLscherm scherm;
+  scherm.Run();
   
   return 0;
 }
