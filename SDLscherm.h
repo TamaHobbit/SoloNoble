@@ -15,7 +15,7 @@ void runSDL(){
   if (renderer == NULL){
     SDL_ShowSimpleMessageBox(0, "Renderer init error", SDL_GetError(), window);
   }
-  SDL_Surface * image = IMG_Load("gfx/board-empty.png");
+  SDL_Surface * image = IMG_Load("gfx/board-empty.jpg");
   if (image == NULL){ 
     SDL_ShowSimpleMessageBox(0, "Image init error", SDL_GetError(), window);
   }
