@@ -16,6 +16,9 @@ public:
     bool quit = false;
     SDL_Event event;
 
+    SDL_RenderCopy(renderer, boardTexture, nullptr, nullptr);
+    DisplayTick(crossTexture);
+    DisplayPins();
     while (!quit) {
       SDL_WaitEvent(&event);
       switch(event.type) {
@@ -23,9 +26,6 @@ public:
          quit = true;
          break;
       }
-      SDL_RenderCopy(renderer, boardTexture, nullptr, nullptr);
-      DisplayTick(crossTexture);
-      DisplayPins();
       SDL_RenderPresent(renderer);
     }
   }
@@ -103,7 +103,7 @@ private:
   };
 
   std::pair<int,int> GetScreenLocationForHole(int xPos, int yPos){
-    //return std::pair<int, int>(xPos*127 + 112, yPos*125 + 108 - xPos*2);
+    //return std::pair<int, int>(xPos*127 + 112, yPos*125 + 108 - xPos*2); //approximation
     return holeToPositionMap[std::pair<int,int>(xPos,yPos)];
   }
 
