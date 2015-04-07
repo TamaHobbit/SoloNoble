@@ -26,6 +26,7 @@ bool zetKan(int x, int y, richting springKant){
     case links:
       return x > 1 && gaten[x-1][y] == knikker && gaten[x-2][y] == open;
   }
+  return false;
 }
 
 void doeZet(int x, int y, richting springKant){

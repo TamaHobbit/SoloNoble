@@ -1,4 +1,5 @@
 #include <iostream>
+#include <map>
 using namespace std;
 
 const char open = 'O';
@@ -16,10 +17,6 @@ char gaten[7][7];
 int main(){
 
   beginSituatie();
-  
-  //SpelerMagSpelen();
-
-  //LosMaarOp();
 
   SDLscherm scherm;
   scherm.Run();
