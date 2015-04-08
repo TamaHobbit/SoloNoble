@@ -29,6 +29,26 @@ bool zetKan(int x, int y, richting springKant){
   return false;
 }
 
+bool zetKan(int x, int y, int toX, int toY){
+  if( toX == x ){
+    if( toY == y-2 ){
+      return zetKan(x,y,boven);
+    }
+    if( toY == y+2 ){
+      return zetKan(x,y,onder);
+    }
+  }
+  if( toY == y ){
+    if( toX == x-2 ){
+      return zetKan(x,y,links);
+    }
+    if( toX == x+2 ){
+      return zetKan(x,y,rechts);
+    }
+  }
+  return false;
+}
+
 void doeZet(int x, int y, richting springKant){
   gaten[x][y] = open;
   switch( springKant ){
@@ -48,6 +68,25 @@ void doeZet(int x, int y, richting springKant){
       gaten[x-1][y] = open;
       gaten[x-2][y] = knikker;
       return;
+  }
+}
+
+void doeZet(int x, int y, int toX, int toY){
+  if( toX == x ){
+    if( toY == y-2 ){
+      doeZet(x,y,boven);
+    }
+    if( toY == y+2 ){
+      doeZet(x,y,onder);
+    }
+  }
+  if( toY == y ){
+    if( toX == x-2 ){
+      doeZet(x,y,links);
+    }
+    if( toX == x+2 ){
+      doeZet(x,y,rechts);
+    }
   }
 }
 

@@ -1,5 +1,3 @@
-#include <algorithm>
-
 typedef uint64_t bordKengetal;
 
 // geeft het bordKengetal voor de opstelling die precies 90 graden gedraaid is t.o.v. invoer

@@ -1,9 +1,3 @@
-
-#include <unordered_set>
-#include <list>
-#include <tuple>
-#include <stack>
-
 unordered_set<bordKengetal> alleKennis;
 stack<tuple<int,int,richting>> huidigePad;
 

@@ -1,13 +1,10 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
-
 const int resolution_X = 1024, resolution_Y = 1024;
 
 class SDLscherm {
 public:
 
 
-  SDLscherm(){
+  SDLscherm() : clickState(*this){
     InitSDL();
     InitPictures();
   }
@@ -16,18 +13,29 @@ public:
     bool quit = false;
     SDL_Event event;
 
-    SDL_RenderCopy(renderer, boardTexture, nullptr, nullptr);
-    DisplayTick(crossTexture);
-    DisplayPins();
+    UpdateDisplay();
     while (!quit) {
       SDL_WaitEvent(&event);
       switch(event.type) {
-      case SDL_QUIT:
-         quit = true;
-         break;
+        case SDLK_ESCAPE:
+        case SDL_QUIT:
+          quit = true;
+          break;
+        case SDL_MOUSEBUTTONDOWN:
+          clickState.MouseDown(FindPinForPosition(std::make_pair(event.button.x, event.button.y)));
+          break;
+        case SDL_MOUSEBUTTONUP:
+          clickState.MouseUp(FindPinForPosition(std::make_pair(event.button.x, event.button.y)));
+          break;
       }
       SDL_RenderPresent(renderer);
     }
+  }
+
+  void UpdateDisplay(){
+    SDL_RenderCopy(renderer, boardTexture, nullptr, nullptr);
+    DisplayTick(crossTexture);
+    DisplayPins();
   }
 
   void DisplayPins(){
@@ -36,7 +44,6 @@ public:
         if( gaten[x][y] == knikker ){
           auto location = GetScreenLocationForHole(x, y);
           ApplySurface(location.first, location.second, pinTexture);
-          //printf("    { std::pair<int,int>(%i,%i), std::pair<int,int>(%i,%i) },\n", x, y, location.first, location.second);
         }
       }
     }
@@ -44,6 +51,40 @@ public:
 
   void DisplayTick(SDL_Texture * tickTexture){
     ApplySurface(750, 150, tickTexture);
+  }
+
+  std::pair<int,int> FindPinForPosition(std::pair<int,int> mousePosition){
+    auto pins = std::make_pair((mousePosition.first-squareStartPosX)/clickSquareSizeX, (mousePosition.second-squareStartPosY)/clickSquareSizeY);
+    //printf("Position %i, %i maps to %i, %i\n", mousePosition.first, mousePosition.second, pins.first, pins.second);
+    return pins;
+  }
+
+  bool ownPiece(std::pair<int,int> mouseTile){
+    if( !onBoard(mouseTile) ){
+      return false;
+    }
+    return gaten[mouseTile.first][mouseTile.second] == knikker;
+  }
+
+  void select(std::pair<int,int> mouseTile){}
+  void deselect(){}
+
+  bool validMove(std::pair<int,int> from, std::pair<int,int> to){
+    //printf("Checking move: %i, %i to %i, %i\n", from.first, from.second, to.first, to.second);
+    if( !onBoard(from) || !onBoard(to) ){
+      return false;
+    }
+    return zetKan(from.first, from.second, to.first, to.second);
+  }
+
+  bool onBoard(std::pair<int,int> tileIndex){
+    return tileIndex.first >= 0 && tileIndex.first < 7 && tileIndex.second >= 0 && tileIndex.second < 7;
+  }
+
+  void makeMove(std::pair<int,int> from, std::pair<int,int> to){
+    //printf("Doing move: %i, %i to %i, %i\n", from.first, from.second, to.first, to.second);
+    doeZet(from.first, from.second, to.first, to.second);
+    UpdateDisplay();
   }
 
   ~SDLscherm(){
@@ -59,6 +100,11 @@ public:
   }
 
 private:
+  const int clickSquareSizeX = 127;
+  const int squareStartPosX = 56;
+  const int clickSquareSizeY = 125;
+  const int squareStartPosY = 54;
+
   SDL_Window * window { nullptr };
   SDL_Renderer * renderer { nullptr };
 
@@ -67,8 +113,10 @@ private:
   SDL_Texture * tickTexture { nullptr };
   SDL_Texture * crossTexture { nullptr };
 
-  std::map<std::pair<int,int>,std::pair<int,int>> holeToPositionMap {
-    { std::pair<int,int>(2,0), std::pair<int,int>(370,96) },
+  TwoClickOrDrag<SDLscherm> clickState;
+
+  const std::map<std::pair<int,int>,std::pair<int,int>> holeToPositionMap {
+    { std::pair<int,int>(2,0), std::pair<int,int>(370,96) }, // (x,y) position -> (xPixels, yPixels)
     { std::pair<int,int>(3,0), std::pair<int,int>(496,97) },
     { std::pair<int,int>(4,0), std::pair<int,int>(626,98) },
     { std::pair<int,int>(2,1), std::pair<int,int>(366,226) },
@@ -99,12 +147,13 @@ private:
     { std::pair<int,int>(4,5), std::pair<int,int>(620,737) },
     { std::pair<int,int>(2,6), std::pair<int,int>(367,862) },
     { std::pair<int,int>(3,6), std::pair<int,int>(490,864) },
-    { std::pair<int,int>(4,6), std::pair<int,int>(621,862) }
+    { std::pair<int,int>(4,6), std::pair<int,int>(621,862) },
+    { std::pair<int,int>(3,3), std::pair<int,int>(496,480) } //middle pin
   };
 
   std::pair<int,int> GetScreenLocationForHole(int xPos, int yPos){
     //return std::pair<int, int>(xPos*127 + 112, yPos*125 + 108 - xPos*2); //approximation
-    return holeToPositionMap[std::pair<int,int>(xPos,yPos)];
+    return holeToPositionMap.at(std::pair<int,int>(xPos,yPos));
   }
 
   void InitSDL(){
