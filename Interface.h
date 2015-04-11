@@ -34,7 +34,8 @@ void toonSituatie(){
   cout << endl << "Kengetal: " << encodeerBord() << endl;
   cout << "Mogelijke zetten: " << endl;
     
-  doeVoorMogelijkeZetten([](int x, int y, richting r){
+    /*
+  doeVoorMogelijkeZetten([](int x, int y, int toX, int toY){
     cout << x << " " << y;
     if( r == boven ){
       cout << " boven" << endl;
@@ -45,7 +46,7 @@ void toonSituatie(){
     } else if( r == links ){
       cout << " links" << endl;
     }
-  });
+  });*/
   cout << "======Uw zet:======" << endl;
 }
 
@@ -91,7 +92,7 @@ void SpelerMagSpelen(){
 // toon de nodige zetten om te winnen of "onmogelijk"
 void LosMaarOp(){
   try {
-    stellingTeRedden();
+    stellingTeRedden(encodeerBord());
   } catch( bool antwoord ){
     cout << "NB: antwoord is achterstevoren; bovenaan staat de laatste zet." << endl;
     while (!huidigePad.empty()){
@@ -101,4 +102,17 @@ void LosMaarOp(){
     return;
   }
   cout << "Dit spel is onmogelijk te winnen." << endl;
+}
+
+bool IsSolveable(){
+  printf("Started calculation\n");
+
+  try {
+    stellingTeRedden(encodeerBord());
+  } catch( bool antwoord ){
+    printf("Finished calculation: true\n");
+    return true;
+  }
+  printf("Finished calculation: false\n");
+  return false;
 }

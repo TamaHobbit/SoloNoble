@@ -2,21 +2,21 @@ unordered_set<bordKengetal> alleKennis;
 stack<tuple<int,int,richting>> huidigePad;
 
 // Voor alle lege gaten, kijk of daarnaast twee knikkers op een rij zitten
-void doeVoorMogelijkeZetten(std::function<void(int,int,richting)> todo){
+void doeVoorMogelijkeZetten(bordKengetal state, std::function<void(int,int,int,int)> todo){
   for( int y = 0; y < 7; ++y ){  
     for( int x = 0; x < 7; ++x ){
-      if( gaten[x][y] == open ){
-        if( y > 1 && gaten[x][y-1] == knikker && gaten[x][y-2] == knikker ){
-          todo( x, y-2, onder );
+      if( !isBezet(state, x, y) ){
+        if( y > 1 && isBezet(state, x, y-1) && isBezet(state,x,y-2) ){
+          todo( x, y-2, x, y );
         }
-        if( x < 5 && gaten[x+1][y] == knikker && gaten[x+2][y] == knikker ){
-          todo( x+2, y, links );
+        if( x < 5 && isBezet(state, x+1, y) && isBezet(state, x+2, y) ){
+          todo( x+2, y, x, y );
         }
-        if( y < 5 && gaten[x][y+1] == knikker && gaten[x][y+2] == knikker ){
-          todo( x, y+2, boven );
+        if( y < 5 && isBezet(state, x, y+1) && isBezet(state, x, y+2) ){
+          todo( x, y+2, x, y );
         }
-        if( x > 1 && gaten[x-1][y] == knikker && gaten[x-2][y] == knikker ){
-          todo( x-2, y, rechts );
+        if( x > 1 && isBezet(state, x-1, y) && isBezet(state, x-2, y) ){
+          todo( x-2, y, x, y );
         }
       }
     }
@@ -27,34 +27,29 @@ void doeVoorMogelijkeZetten(std::function<void(int,int,richting)> todo){
 // steeds een zet te doen, zichzelf aan te roepen, en dan de zet terug te doen
 // elke stelling hoeft maar 1 keer worden bekeken (of een punt- of lijnsymmetrishe )
 // "throw true" als de oplossing is gevonden, zodat huidigePad nog steeds de zetten bevat
-void stellingTeRedden(){
-  // encodeert de opstelling in 1 int, zodanig dat symmetrische stelling ook hetzelfde kengetal geven
-  bordKengetal huidigeOpstelling = encodeerBord();
-
+void stellingTeRedden(bordKengetal encodedBoard){
   // kijk of we hem al hebben gezien
-  unordered_set<bordKengetal>::iterator alBekend = alleKennis.find ( huidigeOpstelling );
+  unordered_set<bordKengetal>::iterator alBekend = alleKennis.find ( encodedBoard );
   if( alBekend != alleKennis.end() ){
     return;
   }
 
   // oplossing gevonden
-  if( gewonnen() ){
+  if( gewonnen(encodedBoard) ){
     throw true;
   }
 
   // probeer alle zetten in de huidige opstelling
-  doeVoorMogelijkeZetten([] (int x, int y, richting r){
-    doeZet( x, y, r );
-    huidigePad.push( make_tuple(x,y,r) );
+  doeVoorMogelijkeZetten(encodedBoard, [encodedBoard] (int x, int y, int toX, int toY){
+    //huidigePad.push( make_tuple(x,y,toX,toY) );
 
     // recursie
-    stellingTeRedden();
+    stellingTeRedden(doeZet( encodedBoard, x, y, toX, toY ));
 
-    zetTerug( x, y, r );
-    huidigePad.pop();
+    //huidigePad.pop();
   });
 
   // opslaan dat we deze al hebben gezien
-  alleKennis.insert( huidigeOpstelling );
+  alleKennis.insert( encodedBoard );
 }
 

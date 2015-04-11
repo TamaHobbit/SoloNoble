@@ -122,3 +122,8 @@ bool gewonnen(){
   }
   return true;
 }
+
+bool gewonnen(bordKengetal state){
+  bordKengetal middleMask = gatMask(3,3);
+  return state == middleMask;
+}

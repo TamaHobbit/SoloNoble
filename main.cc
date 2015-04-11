@@ -5,8 +5,12 @@
 #include <list>
 #include <tuple>
 #include <stack>
+#include <atomic>
+#include <thread>
+#include <condition_variable>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <cassert>
 using namespace std;
 
 const char open = 'O';
@@ -26,8 +30,14 @@ int main(){
 
   beginSituatie();
 
-  SDLscherm scherm;
-  scherm.Run();
+  //SDLscherm scherm;
+  //scherm.Run();
+  if( IsSolveable() ){
+  	cout << "y";
+  } else {
+  	cout << "n";
+  }
+  cout << "ay" << endl;
   
   return 0;
 }

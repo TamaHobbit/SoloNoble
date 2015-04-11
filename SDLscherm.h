@@ -3,8 +3,19 @@ const int resolution_X = 1024, resolution_Y = 1024;
 class SDLscherm {
 public:
 
+  std::atomic<bool> canStillWin { true };
+  std::atomic<bool> isCalculating { false };
 
-  SDLscherm() : clickState(*this){
+  std::condition_variable gamestateChangedCondition;
+  std::thread calculate_thread;
+  std::mutex gamestate_mutex;
+
+  std::condition_variable calculationFinishedCondition;
+  std::thread display_thread;
+
+  //std::future<bool> calculate_future;
+
+  SDLscherm() : calculate_thread(&SDLscherm::CalculatingThread, this), clickState(*this) {
     InitSDL();
     InitPictures();
   }
@@ -32,13 +43,33 @@ public:
     }
   }
 
+  void CalculatingThread(){
+    while(true){
+      std::unique_lock<std::mutex> lk(gamestate_mutex);
+      gamestateChangedCondition.wait( lk,[this]{
+        return isCalculating.load();
+      } );
+      const bool calcResult = IsSolveable();
+      lk.unlock();
+      canStillWin = calcResult;
+      isCalculating = false;
+    }
+  }
+
   void UpdateDisplay(){
     SDL_RenderCopy(renderer, boardTexture, nullptr, nullptr);
-    DisplayTick(crossTexture);
+    if( isCalculating ){
+      DisplayTick(processingTexture);
+    } else if( canStillWin ){
+      DisplayTick( tickTexture );
+    } else {
+      DisplayTick( crossTexture );
+    }
     DisplayPins();
   }
 
   void DisplayPins(){
+    //std::unique_lock<std::mutex> lk(gamestate_mutex);
     for( int y = 0; y < 7; ++y ){  
       for( int x = 0; x < 7; ++x ){
         if( gaten[x][y] == knikker ){
@@ -82,21 +113,35 @@ public:
   }
 
   void makeMove(std::pair<int,int> from, std::pair<int,int> to){
+    std::unique_lock<std::mutex> lk(gamestate_mutex);
     //printf("Doing move: %i, %i to %i, %i\n", from.first, from.second, to.first, to.second);
     doeZet(from.first, from.second, to.first, to.second);
+    isCalculating = true;
     UpdateDisplay();
+    lk.unlock();
+    gamestateChangedCondition.notify_one();
   }
 
   ~SDLscherm(){
+    isCalculating = false;
+
     CleanUp(boardTexture);
     CleanUp(pinTexture);
     CleanUp(tickTexture);
     CleanUp(crossTexture);
+    CleanUp(processingTexture);
     CleanUp(renderer);
     CleanUp(window);
 
     IMG_Quit();
     SDL_Quit();
+
+    if( calculate_thread.joinable() ){
+      calculate_thread.join();
+    }
+    if( display_thread.joinable() ){
+      display_thread.join();
+    }
   }
 
 private:
@@ -112,6 +157,7 @@ private:
   SDL_Texture * pinTexture { nullptr };
   SDL_Texture * tickTexture { nullptr };
   SDL_Texture * crossTexture { nullptr };
+  SDL_Texture * processingTexture { nullptr };
 
   TwoClickOrDrag<SDLscherm> clickState;
 
@@ -175,6 +221,7 @@ private:
     LoadImage("gfx/pin.gif", pinTexture);
     LoadImage("gfx/tick.gif", tickTexture);
     LoadImage("gfx/cross.gif", crossTexture);
+    LoadImage("gfx/processing.gif", processingTexture);
   }
 
   void LoadImage(std::string filename, SDL_Texture *& textureptr){
