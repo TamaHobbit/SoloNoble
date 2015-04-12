@@ -51,8 +51,7 @@ public:
       recalculateCondition.wait(lk, [this]{
         return isCalculating.load();
       });*/
-      const bool calcResult = IsSolveable();
-      canStillWin = calcResult;
+      canStillWin = IsSolveable();
       isCalculating = false;
     }
   }

@@ -5,6 +5,9 @@ stack<tuple<int,int,richting>> huidigePad;
 void doeVoorMogelijkeZetten(bordKengetal state, std::function<void(int,int,int,int)> todo){
   for( int y = 0; y < 7; ++y ){  
     for( int x = 0; x < 7; ++x ){
+      if( !holeIsOnBoard(x,y) ){
+        continue;
+      }
       if( !isBezet(state, x, y) ){
         if( y > 1 && isBezet(state, x, y-1) && isBezet(state,x,y-2) ){
           todo( x, y-2, x, y );
@@ -29,12 +32,12 @@ void doeVoorMogelijkeZetten(bordKengetal state, std::function<void(int,int,int,i
 // "throw true" als de oplossing is gevonden, zodat huidigePad nog steeds de zetten bevat
 void stellingTeRedden(bordKengetal encodedBoard){
   // kijk of we hem al hebben gezien
-  /*
+  
   unordered_set<bordKengetal>::iterator alBekend = alleKennis.find ( encodedBoard );
   if( alBekend != alleKennis.end() ){
     return;
   }
-*/
+
   // oplossing gevonden
   if( gewonnen(encodedBoard) ){
     throw true;
@@ -51,6 +54,6 @@ void stellingTeRedden(bordKengetal encodedBoard){
   });
 
   // opslaan dat we deze al hebben gezien
-  //alleKennis.insert( encodedBoard );
+  alleKennis.insert( encodedBoard );
 }
 

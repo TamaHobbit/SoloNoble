@@ -1,18 +1,3 @@
-void beginSituatie(){
-  for( int y = 0; y < 7; ++y ){  
-    for( int x = 0; x < 7; ++x ){
-      if( (x < 2 || x > 4) && (y < 2 || y > 4) ){
-        gaten[x][y] = bestaatNiet;
-      } else {
-        gaten[x][y] = knikker;
-      }
-    }
-  }
-  gaten[3][3] = open;
-  //gaten[3][4] = open;
-  //gaten[3][5] = open;
-}
-
 enum richting {
   boven, rechts, onder, links
 };
@@ -71,6 +56,23 @@ void doeZet(int x, int y, richting springKant){
       gaten[x-2][y] = knikker;
       return;
   }
+}
+
+bool holeIsOnBoard(int x, int y){
+  return !( (x < 2 || x > 4) && (y < 2 || y > 4) );
+}
+
+void beginSituatie(){
+  for( int y = 0; y < 7; ++y ){  
+    for( int x = 0; x < 7; ++x ){
+      if( holeIsOnBoard(x,y) ){
+        gaten[x][y] = knikker;
+      } else {
+        gaten[x][y] = bestaatNiet;
+      }
+    }
+  }
+  gaten[3][3] = open;
 }
 
 void doeZet(int x, int y, int toX, int toY){

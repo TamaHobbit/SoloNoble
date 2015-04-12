@@ -30,10 +30,8 @@ int main(){
 
   beginSituatie();
 
-  //SDLscherm scherm;
-  //scherm.Run();
-
-  IsSolveable();
+  SDLscherm scherm;
+  scherm.Run();
   
   return 0;
 }
