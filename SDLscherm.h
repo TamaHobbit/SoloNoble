@@ -5,6 +5,7 @@ public:
 
   std::atomic<bool> canStillWin { true };
   std::atomic<bool> isCalculating { false };
+  std::atomic<bool> shutDown { false };
 
   std::condition_variable recalculateCondition;
   std::mutex calculateWait;
@@ -38,12 +39,15 @@ public:
       }
       UpdateDisplay();
       SDL_RenderPresent(renderer);
-      std::this_thread::yield();
+      //std::this_thread::yield();
     }
   }
 
   void CalculatingThread(){
     while(true){
+      if( shutDown ){
+        return;
+      }
       if( !isCalculating ){
         continue;
       }
@@ -53,6 +57,7 @@ public:
       });*/
       canStillWin = IsSolveable();
       isCalculating = false;
+      UpdateDisplay();
     }
   }
 
@@ -121,6 +126,7 @@ public:
   }
 
   ~SDLscherm(){
+    shutDown = true;
     isCalculating = false;
 
     CleanUp(boardTexture);
