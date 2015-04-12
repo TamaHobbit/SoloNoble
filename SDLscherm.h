@@ -90,16 +90,14 @@ private:
   std::atomic<bool> shutDown { false };
   std::atomic<bool> calculationCancelled { false };
 
-  std::condition_variable recalculateCondition;
-  std::mutex calculateWait;
   std::thread calculate_thread;
 
-  const int clickSquareSizeX = 127;
+  int clickSquareSizeX = 127 ;
   const int squareStartPosX = 56;
   const int clickSquareSizeY = 125;
   const int squareStartPosY = 54;
 
-  SDL_Window * window { nullptr };
+  SDL_Window * window = nullptr ;
   SDL_Renderer * renderer { nullptr };
 
   SDL_Texture * boardTexture { nullptr };
@@ -213,7 +211,6 @@ private:
       calculationCancelled = true;
     }
     isCalculating = true;
-    recalculateCondition.notify_one();
   }
 
   void reverseMove(){
