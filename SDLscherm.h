@@ -37,55 +37,6 @@ public:
     }
   }
 
-  void CalculatingThread(){
-    IsSolveable(calculationCancelled);
-    while(true){
-      if( shutDown ){
-        return;
-      }
-      if( !isCalculating ){
-        continue;
-      }
-      calculationCancelled = false;
-      canStillWin = IsSolveable(calculationCancelled);
-      isCalculating = calculationCancelled.load();
-    }
-  }
-
-  void UpdateDisplay(){
-    SDL_RenderCopy(renderer, boardTexture, nullptr, nullptr);
-    if( isCalculating ){
-      DisplayTick(processingTexture);
-    } else if( canStillWin ){
-      DisplayTick( tickTexture );
-    } else {
-      DisplayTick( crossTexture );
-    }
-    DisplayPins();
-  }
-
-  void DisplayPins(){
-    //std::unique_lock<std::mutex> lk(gamestate_mutex);
-    for( int y = 0; y < 7; ++y ){  
-      for( int x = 0; x < 7; ++x ){
-        if( gaten[x][y] == knikker ){
-          auto location = GetScreenLocationForHole(x, y);
-          ApplySurface(location.first, location.second, pinTexture);
-        }
-      }
-    }
-  }
-
-  void DisplayTick(SDL_Texture * tickTexture){
-    ApplySurface(750, 150, tickTexture);
-  }
-
-  std::pair<int,int> FindPinForPosition(std::pair<int,int> mousePosition){
-    auto pins = std::make_pair((mousePosition.first-squareStartPosX)/clickSquareSizeX, (mousePosition.second-squareStartPosY)/clickSquareSizeY);
-    //printf("Position %i, %i maps to %i, %i\n", mousePosition.first, mousePosition.second, pins.first, pins.second);
-    return pins;
-  }
-
   bool ownPiece(std::pair<int,int> mouseTile){
     if( !onBoard(mouseTile) ){
       return false;
@@ -104,33 +55,9 @@ public:
     return zetKan(from.first, from.second, to.first, to.second);
   }
 
-  bool onBoard(std::pair<int,int> tileIndex){
-    return tileIndex.first >= 0 && tileIndex.first < 7 && tileIndex.second >= 0 && tileIndex.second < 7
-           && holeIsOnBoard(tileIndex.first, tileIndex.second);
-  }
-
-  void HandleMoveMade(){
-    UpdateDisplay();
-    if( isCalculating ){
-      calculationCancelled = true;
-    }
-    isCalculating = true;
-    recalculateCondition.notify_one();
-  }
-
   void makeMove(std::pair<int,int> from, std::pair<int,int> to){
     doeZet(from.first, from.second, to.first, to.second);
     movesDone.push(std::make_tuple(from.first, from.second, to.first, to.second));
-    HandleMoveMade();
-  }
-
-  void reverseMove(){
-    if( movesDone.empty() ){
-      return;
-    }
-    auto lastMove = movesDone.top();
-    zetTerug(std::get<0>(lastMove), std::get<1>(lastMove), std::get<2>(lastMove), std::get<3>(lastMove));
-    movesDone.pop();
     HandleMoveMade();
   }
 
@@ -222,6 +149,81 @@ private:
   std::pair<int,int> GetScreenLocationForHole(int xPos, int yPos){
     //return std::pair<int, int>(xPos*127 + 112, yPos*125 + 108 - xPos*2); //approximation
     return holeToPositionMap.at(std::pair<int,int>(xPos,yPos));
+  }
+
+  void CalculatingThread(){
+    stellingTeRedden(encodeerBord(), canStillWin, calculationCancelled);
+    while(true){
+      if( shutDown ){
+        return;
+      }
+      if( !isCalculating ){
+        continue;
+      }
+      calculationCancelled = false;
+      stellingTeRedden(encodeerBord(), canStillWin, calculationCancelled);
+      isCalculating = calculationCancelled.load();
+    }
+  }
+
+  void UpdateDisplay(){
+    SDL_RenderCopy(renderer, boardTexture, nullptr, nullptr);
+    if( isCalculating ){
+      DisplayTick(processingTexture);
+    } else if( canStillWin ){
+      DisplayTick( tickTexture );
+    } else {
+      DisplayTick( crossTexture );
+    }
+    DisplayPins();
+  }
+
+  void DisplayPins(){
+    //std::unique_lock<std::mutex> lk(gamestate_mutex);
+    for( int y = 0; y < 7; ++y ){  
+      for( int x = 0; x < 7; ++x ){
+        if( gaten[x][y] == knikker ){
+          auto location = GetScreenLocationForHole(x, y);
+          ApplySurface(location.first, location.second, pinTexture);
+        }
+      }
+    }
+  }
+
+  void DisplayTick(SDL_Texture * tickTexture){
+    ApplySurface(750, 150, tickTexture);
+  }
+
+  std::pair<int,int> FindPinForPosition(std::pair<int,int> mousePosition){
+    auto pins = std::make_pair((mousePosition.first-squareStartPosX)/clickSquareSizeX, (mousePosition.second-squareStartPosY)/clickSquareSizeY);
+    //printf("Position %i, %i maps to %i, %i\n", mousePosition.first, mousePosition.second, pins.first, pins.second);
+    return pins;
+  }
+
+  
+
+  bool onBoard(std::pair<int,int> tileIndex){
+    return tileIndex.first >= 0 && tileIndex.first < 7 && tileIndex.second >= 0 && tileIndex.second < 7
+           && holeIsOnBoard(tileIndex.first, tileIndex.second);
+  }
+
+  void HandleMoveMade(){
+    UpdateDisplay();
+    if( isCalculating ){
+      calculationCancelled = true;
+    }
+    isCalculating = true;
+    recalculateCondition.notify_one();
+  }
+
+  void reverseMove(){
+    if( movesDone.empty() ){
+      return;
+    }
+    auto lastMove = movesDone.top();
+    zetTerug(std::get<0>(lastMove), std::get<1>(lastMove), std::get<2>(lastMove), std::get<3>(lastMove));
+    movesDone.pop();
+    HandleMoveMade();
   }
 
   void InitSDL(){

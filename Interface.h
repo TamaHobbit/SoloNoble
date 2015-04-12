@@ -105,16 +105,3 @@ void LosMaarOp(){
   cout << "Dit spel is onmogelijk te winnen." << endl;
 }
 */
-
-bool IsSolveable(std::atomic<bool> & calculationCancelled){
-  //printf("Started calculation\n");
-
-  try {
-    stellingTeRedden(encodeerBord(), calculationCancelled);
-  } catch( bool antwoord ){
-    //printf("Finished calculation: true\n");
-    return true;
-  }
-  //printf("Finished calculation: false\n");
-  return false;
-}
