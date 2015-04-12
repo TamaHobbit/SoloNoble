@@ -30,9 +30,14 @@ void doeVoorMogelijkeZetten(bordKengetal state, std::function<void(int,int,int,i
 // steeds een zet te doen, zichzelf aan te roepen, en dan de zet terug te doen
 // elke stelling hoeft maar 1 keer worden bekeken (of een punt- of lijnsymmetrishe )
 // "throw true" als de oplossing is gevonden, zodat huidigePad nog steeds de zetten bevat
-void stellingTeRedden(bordKengetal encodedBoard){
+void stellingTeRedden(bordKengetal encodedBoard, std::atomic<bool> & calculationCancelled){
   // kijk of we hem al hebben gezien
   
+  if( calculationCancelled ){
+    return;
+  }
+
+
   unordered_set<bordKengetal>::iterator alBekend = alleKennis.find ( encodedBoard );
   if( alBekend != alleKennis.end() ){
     return;
@@ -44,11 +49,11 @@ void stellingTeRedden(bordKengetal encodedBoard){
   }
 
   // probeer alle zetten in de huidige opstelling
-  doeVoorMogelijkeZetten(encodedBoard, [encodedBoard] (int x, int y, int toX, int toY){
+  doeVoorMogelijkeZetten(encodedBoard, [encodedBoard, &calculationCancelled] (int x, int y, int toX, int toY){
     //huidigePad.push( make_tuple(x,y,toX,toY) );
 
     // recursie
-    stellingTeRedden(doeZet( encodedBoard, x, y, toX, toY ));
+    stellingTeRedden(doeZet( encodedBoard, x, y, toX, toY ), calculationCancelled);
 
     //huidigePad.pop();
   });

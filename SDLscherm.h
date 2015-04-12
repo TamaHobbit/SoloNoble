@@ -38,7 +38,7 @@ public:
   }
 
   void CalculatingThread(){
-    IsSolveable();
+    IsSolveable(calculationCancelled);
     while(true){
       if( shutDown ){
         return;
@@ -46,8 +46,9 @@ public:
       if( !isCalculating ){
         continue;
       }
-      canStillWin = IsSolveable();
-      isCalculating = false;
+      calculationCancelled = false;
+      canStillWin = IsSolveable(calculationCancelled);
+      isCalculating = calculationCancelled.load();
     }
   }
 
@@ -109,8 +110,11 @@ public:
   }
 
   void HandleMoveMade(){
-    isCalculating = true;
     UpdateDisplay();
+    if( isCalculating ){
+      calculationCancelled = true;
+    }
+    isCalculating = true;
     recalculateCondition.notify_one();
   }
 
@@ -132,6 +136,7 @@ public:
 
   ~SDLscherm(){
     shutDown = true;
+    calculationCancelled = true;
     isCalculating = false;
 
     CleanUp(boardTexture);
@@ -156,6 +161,7 @@ private:
   std::atomic<bool> canStillWin { true };
   std::atomic<bool> isCalculating { false };
   std::atomic<bool> shutDown { false };
+  std::atomic<bool> calculationCancelled { false };
 
   std::condition_variable recalculateCondition;
   std::mutex calculateWait;

@@ -89,6 +89,7 @@ void SpelerMagSpelen(){
   cout << "Je hebt gewonnen!" << endl; 
 }
 
+/*
 // toon de nodige zetten om te winnen of "onmogelijk"
 void LosMaarOp(){
   try {
@@ -103,16 +104,17 @@ void LosMaarOp(){
   }
   cout << "Dit spel is onmogelijk te winnen." << endl;
 }
+*/
 
-bool IsSolveable(){
-  printf("Started calculation\n");
+bool IsSolveable(std::atomic<bool> & calculationCancelled){
+  //printf("Started calculation\n");
 
   try {
-    stellingTeRedden(encodeerBord());
+    stellingTeRedden(encodeerBord(), calculationCancelled);
   } catch( bool antwoord ){
-    printf("Finished calculation: true\n");
+    //printf("Finished calculation: true\n");
     return true;
   }
-  printf("Finished calculation: false\n");
+  //printf("Finished calculation: false\n");
   return false;
 }
