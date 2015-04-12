@@ -29,11 +29,12 @@ void doeVoorMogelijkeZetten(bordKengetal state, std::function<void(int,int,int,i
 // "throw true" als de oplossing is gevonden, zodat huidigePad nog steeds de zetten bevat
 void stellingTeRedden(bordKengetal encodedBoard){
   // kijk of we hem al hebben gezien
+  /*
   unordered_set<bordKengetal>::iterator alBekend = alleKennis.find ( encodedBoard );
   if( alBekend != alleKennis.end() ){
     return;
   }
-
+*/
   // oplossing gevonden
   if( gewonnen(encodedBoard) ){
     throw true;
@@ -50,6 +51,6 @@ void stellingTeRedden(bordKengetal encodedBoard){
   });
 
   // opslaan dat we deze al hebben gezien
-  alleKennis.insert( encodedBoard );
+  //alleKennis.insert( encodedBoard );
 }
 

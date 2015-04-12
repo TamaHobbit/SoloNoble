@@ -6,12 +6,9 @@ public:
   std::atomic<bool> canStillWin { true };
   std::atomic<bool> isCalculating { false };
 
-  std::condition_variable gamestateChangedCondition;
+  std::condition_variable recalculateCondition;
+  std::mutex calculateWait;
   std::thread calculate_thread;
-  std::mutex gamestate_mutex;
-
-  std::condition_variable calculationFinishedCondition;
-  std::thread display_thread;
 
   //std::future<bool> calculate_future;
 
@@ -39,18 +36,22 @@ public:
           clickState.MouseUp(FindPinForPosition(std::make_pair(event.button.x, event.button.y)));
           break;
       }
+      UpdateDisplay();
       SDL_RenderPresent(renderer);
+      std::this_thread::yield();
     }
   }
 
   void CalculatingThread(){
     while(true){
-      std::unique_lock<std::mutex> lk(gamestate_mutex);
-      gamestateChangedCondition.wait( lk,[this]{
+      if( !isCalculating ){
+        continue;
+      }
+      /*std::unique_lock<std::mutex> lk(calculateWait);
+      recalculateCondition.wait(lk, [this]{
         return isCalculating.load();
-      } );
+      });*/
       const bool calcResult = IsSolveable();
-      lk.unlock();
       canStillWin = calcResult;
       isCalculating = false;
     }
@@ -113,13 +114,11 @@ public:
   }
 
   void makeMove(std::pair<int,int> from, std::pair<int,int> to){
-    std::unique_lock<std::mutex> lk(gamestate_mutex);
-    //printf("Doing move: %i, %i to %i, %i\n", from.first, from.second, to.first, to.second);
     doeZet(from.first, from.second, to.first, to.second);
     isCalculating = true;
     UpdateDisplay();
-    lk.unlock();
-    gamestateChangedCondition.notify_one();
+    recalculateCondition.notify_one();
+    std::this_thread::yield();
   }
 
   ~SDLscherm(){
@@ -138,9 +137,6 @@ public:
 
     if( calculate_thread.joinable() ){
       calculate_thread.join();
-    }
-    if( display_thread.joinable() ){
-      display_thread.join();
     }
   }
 

@@ -9,6 +9,8 @@ void beginSituatie(){
     }
   }
   gaten[3][3] = open;
+  //gaten[3][4] = open;
+  //gaten[3][5] = open;
 }
 
 enum richting {

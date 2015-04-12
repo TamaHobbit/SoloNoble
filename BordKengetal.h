@@ -105,6 +105,7 @@ bordKengetal gatMask(int targetX, int targetY){
   return holeMasks[targetY*7+targetX];
 }
 
+/*
 //used to populate table above
 bordKengetal berekenGatMask(int targetX, int targetY){
   bordKengetal toFlip = 0;
@@ -180,6 +181,7 @@ bordKengetal berekenGatMask(int targetX, int targetY){
   }
   return toFlip;
 }
+*/
 
 bordKengetal doeZet(bordKengetal state, int x, int y, int toX, int toY){
   int middleX = (x + toX) / 2;

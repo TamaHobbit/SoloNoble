@@ -32,12 +32,8 @@ int main(){
 
   //SDLscherm scherm;
   //scherm.Run();
-  if( IsSolveable() ){
-  	cout << "y";
-  } else {
-  	cout << "n";
-  }
-  cout << "ay" << endl;
+
+  IsSolveable();
   
   return 0;
 }
