@@ -57,7 +57,6 @@ public:
       });*/
       canStillWin = IsSolveable();
       isCalculating = false;
-      UpdateDisplay();
     }
   }
 
