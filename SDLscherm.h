@@ -2,17 +2,6 @@ const int resolution_X = 1024, resolution_Y = 1024;
 
 class SDLscherm {
 public:
-
-  std::atomic<bool> canStillWin { true };
-  std::atomic<bool> isCalculating { false };
-  std::atomic<bool> shutDown { false };
-
-  std::condition_variable recalculateCondition;
-  std::mutex calculateWait;
-  std::thread calculate_thread;
-
-  //std::future<bool> calculate_future;
-
   SDLscherm() : calculate_thread(&SDLscherm::CalculatingThread, this), clickState(*this) {
     InitSDL();
     InitPictures();
@@ -30,20 +19,26 @@ public:
         case SDL_QUIT:
           quit = true;
           break;
-        case SDL_MOUSEBUTTONDOWN:
-          clickState.MouseDown(FindPinForPosition(std::make_pair(event.button.x, event.button.y)));
+        case SDL_MOUSEBUTTONDOWN: {
+          auto pinPosition = FindPinForPosition(std::make_pair(event.button.x, event.button.y));
+          if( onBoard(pinPosition) ){
+            clickState.MouseDown(pinPosition);
+          } else if( pinPosition.first == 1 && pinPosition.second == 5 ){
+            reverseMove();
+          }
           break;
+        }
         case SDL_MOUSEBUTTONUP:
           clickState.MouseUp(FindPinForPosition(std::make_pair(event.button.x, event.button.y)));
           break;
       }
       UpdateDisplay();
       SDL_RenderPresent(renderer);
-      //std::this_thread::yield();
     }
   }
 
   void CalculatingThread(){
+    IsSolveable();
     while(true){
       if( shutDown ){
         return;
@@ -51,10 +46,6 @@ public:
       if( !isCalculating ){
         continue;
       }
-      /*std::unique_lock<std::mutex> lk(calculateWait);
-      recalculateCondition.wait(lk, [this]{
-        return isCalculating.load();
-      });*/
       canStillWin = IsSolveable();
       isCalculating = false;
     }
@@ -113,15 +104,30 @@ public:
   }
 
   bool onBoard(std::pair<int,int> tileIndex){
-    return tileIndex.first >= 0 && tileIndex.first < 7 && tileIndex.second >= 0 && tileIndex.second < 7;
+    return tileIndex.first >= 0 && tileIndex.first < 7 && tileIndex.second >= 0 && tileIndex.second < 7
+           && holeIsOnBoard(tileIndex.first, tileIndex.second);
+  }
+
+  void HandleMoveMade(){
+    isCalculating = true;
+    UpdateDisplay();
+    recalculateCondition.notify_one();
   }
 
   void makeMove(std::pair<int,int> from, std::pair<int,int> to){
     doeZet(from.first, from.second, to.first, to.second);
-    isCalculating = true;
-    UpdateDisplay();
-    recalculateCondition.notify_one();
-    std::this_thread::yield();
+    movesDone.push(std::make_tuple(from.first, from.second, to.first, to.second));
+    HandleMoveMade();
+  }
+
+  void reverseMove(){
+    if( movesDone.empty() ){
+      return;
+    }
+    auto lastMove = movesDone.top();
+    zetTerug(std::get<0>(lastMove), std::get<1>(lastMove), std::get<2>(lastMove), std::get<3>(lastMove));
+    movesDone.pop();
+    HandleMoveMade();
   }
 
   ~SDLscherm(){
@@ -145,6 +151,16 @@ public:
   }
 
 private:
+  std::stack<tuple<int,int,int,int>> movesDone;
+
+  std::atomic<bool> canStillWin { true };
+  std::atomic<bool> isCalculating { false };
+  std::atomic<bool> shutDown { false };
+
+  std::condition_variable recalculateCondition;
+  std::mutex calculateWait;
+  std::thread calculate_thread;
+
   const int clickSquareSizeX = 127;
   const int squareStartPosX = 56;
   const int clickSquareSizeY = 125;

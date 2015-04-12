@@ -116,6 +116,14 @@ void zetTerug(int x, int y, richting springKant){
   }
 }
 
+void zetTerug(int x, int y, int toX, int toY){
+  int middleX = (x + toX) / 2;
+  int middleY = (y + toY) / 2;
+  gaten[x][y] = knikker;
+  gaten[middleX][middleY] = knikker;
+  gaten[toX][toY] = open;
+}
+
 bool gewonnen(){
   for( int y = 0; y < 7; ++y ){  
     for( int x = 0; x < 7; ++x ){

@@ -1,3 +1,8 @@
+/* Summary:
+	TwoClickOrDrag makes only valid moves, using either two click input 
+	or a mousedrag, given mousedown/up events. It is assumed that you cannot move onto your own piece, but this can be changed easily
+*/
+
 /* Contract:
 TCallBackHandler must implement:
 bool ownPiece(std::pair<int,int> mouseTile);
