@@ -65,6 +65,7 @@ public:
     shutDown = true;
     calculationCancelled = true;
     isCalculating = false;
+    newCalculationRequired.notify_one();
 
     CleanUp(boardTexture);
     CleanUp(pinTexture);
@@ -84,6 +85,8 @@ public:
 
 private:
   std::stack<tuple<int,int,int,int>> movesDone;
+
+  std::condition_variable newCalculationRequired;
 
   std::atomic<bool> canStillWin { true };
   std::atomic<bool> isCalculating { false };
@@ -152,13 +155,16 @@ private:
   void CalculatingThread(){
     stellingTeRedden(encodeerBord(), canStillWin, calculationCancelled);
     while(true){
-      if( shutDown ){
+      std::mutex mut;
+      std::unique_lock<std::mutex> lk(mut);
+      newCalculationRequired.wait( lk, [this]{ //wait on this line of code until
+        return isCalculating.load() or shutDown.load(); //need to calculate or shutdown
+      } );
+      if( shutDown ){ //in destructor this is set and then above condition is notified
         return;
       }
-      if( !isCalculating ){
-        continue;
-      }
       calculationCancelled = false;
+      //pass these by reference so the other thread can check calculationCancelled and set the answer in canStillWin
       stellingTeRedden(encodeerBord(), canStillWin, calculationCancelled);
       isCalculating = calculationCancelled.load();
     }
@@ -211,6 +217,7 @@ private:
       calculationCancelled = true;
     }
     isCalculating = true;
+    newCalculationRequired.notify_one();
   }
 
   void reverseMove(){
