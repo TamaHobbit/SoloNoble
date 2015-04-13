@@ -212,7 +212,6 @@ private:
   }
 
   void HandleMoveMade(){
-    UpdateDisplay();
     if( isCalculating ){
       calculationCancelled = true;
     }
