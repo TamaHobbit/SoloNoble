@@ -30,8 +30,11 @@ int main(){
 
   beginSituatie();
 
-  SDLscherm scherm;
-  scherm.Run();
+  bordKengetal current = encodeerBord();
+  cout << "Calculating..." << endl;
+  findAllSolvedPositions(current);
+  cout << "Done, " << alleKennis.size() << " positions checked" << endl;
   
+
   return 0;
 }
