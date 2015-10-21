@@ -29,20 +29,22 @@ char gaten[7][7];
 
 /*
 int main(){
-	basic_ifstream<bordKengetal> dataFile("solutions.bin", ios::in | ios::binary);
+	basic_ifstream<char> dataFile("solutions.bin", ios::in | ios::binary);
 	vector<bordKengetal> allSolutions;
 	bordKengetal currentNumber;
-	while( dataFile.good() ){
-		dataFile.read(&currentNumber,1);
-		allSolutions.push_back(currentNumber);
-		cout << currentNumber << endl;
-	}
+
+  // Dahl loop, or N-and-a-half loop
+  for( ; dataFile.read(reinterpret_cast<char*>(&currentNumber),8), dataFile.good(); ){
+    allSolutions.push_back(currentNumber);
+    cout << currentNumber << endl;
+  }
+
 	cout << allSolutions.size() << endl;
 }
 */
 
-int main(){
-  basic_ofstream<char*> dataFile("solutions.bin", ios::out | ios::binary);
+int main() {
+  basic_ofstream<char> dataFile("solutions.bin", ios::out | ios::binary);
 
   beginSituatie();
   bordKengetal current = 105976010262080;//encodeerBord();
@@ -60,11 +62,15 @@ int main(){
   }
   assert(allSolutions.size() == totalSolutions);
 
-  dataFile.write(reinterpret_cast<char*>(&allSolutions[0]), allSolutions.size() * sizeof(allSolutions[0]));
+  const size_t solutionBytes = allSolutions.size() * sizeof(allSolutions[0]);
+  if( !dataFile.write(reinterpret_cast<char*>(&allSolutions[0]), solutionBytes) ){
+    cout << "Writing to file failed" << endl;
+  }
+  
   dataFile.close();
-  //for(auto s : allSolutions){
-  //	cout << s << endl;
-  //}
+  for(auto s : allSolutions){
+   	cout << s << endl;
+  }
 
   return 0;
 }
