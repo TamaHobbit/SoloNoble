@@ -2,12 +2,13 @@ const int resolution_X = 1024, resolution_Y = 1024;
 
 class SDLscherm {
 public:
-  SDLscherm() : calculate_thread(&SDLscherm::CalculatingThread, this), clickState(*this) {
+  SDLscherm() : clickState(*this) {
     InitSDL();
     InitPictures();
   }
 
   void Run(){
+    loadSolutions();
     bool quit = false;
     SDL_Event event;
 
@@ -62,11 +63,6 @@ public:
   }
 
   ~SDLscherm(){
-    shutDown = true;
-    calculationCancelled = true;
-    isCalculating = false;
-    newCalculationRequired.notify_one();
-
     CleanUp(boardTexture);
     CleanUp(pinTexture);
     CleanUp(tickTexture);
@@ -77,23 +73,12 @@ public:
 
     IMG_Quit();
     SDL_Quit();
-
-    if( calculate_thread.joinable() ){
-      calculate_thread.join();
-    }
   }
 
 private:
   std::stack<tuple<int,int,int,int>> movesDone;
 
-  std::condition_variable newCalculationRequired;
-
-  std::atomic<bool> canStillWin { true };
-  std::atomic<bool> isCalculating { false };
-  std::atomic<bool> shutDown { false };
-  std::atomic<bool> calculationCancelled { false };
-
-  std::thread calculate_thread;
+  bool canStillWin { true };
 
   int clickSquareSizeX = 127 ;
   const int squareStartPosX = 56;
@@ -152,29 +137,9 @@ private:
     return holeToPositionMap.at(std::pair<int,int>(xPos,yPos));
   }
 
-  void CalculatingThread(){
-    stellingTeRedden(encodeerBord(), canStillWin, calculationCancelled);
-    while(true){
-      std::mutex mut;
-      std::unique_lock<std::mutex> lk(mut);
-      newCalculationRequired.wait( lk, [this]{ //wait on this line of code until
-        return isCalculating.load() or shutDown.load(); //need to calculate or shutdown
-      } );
-      if( shutDown ){ //in destructor this is set and then above condition is notified
-        return;
-      }
-      calculationCancelled = false;
-      //pass these by reference so the other thread can check calculationCancelled and set the answer in canStillWin
-      stellingTeRedden(encodeerBord(), canStillWin, calculationCancelled);
-      isCalculating = calculationCancelled.load();
-    }
-  }
-
   void UpdateDisplay(){
     SDL_RenderCopy(renderer, boardTexture, nullptr, nullptr);
-    if( isCalculating ){
-      DisplayTick(processingTexture);
-    } else if( canStillWin ){
+    if( canStillWin ){
       DisplayTick( tickTexture );
     } else {
       DisplayTick( crossTexture );
@@ -183,7 +148,6 @@ private:
   }
 
   void DisplayPins(){
-    //std::unique_lock<std::mutex> lk(gamestate_mutex);
     for( int y = 0; y < 7; ++y ){  
       for( int x = 0; x < 7; ++x ){
         if( gaten[x][y] == knikker ){
@@ -204,19 +168,13 @@ private:
     return pins;
   }
 
-  
-
   bool onBoard(std::pair<int,int> tileIndex){
     return tileIndex.first >= 0 && tileIndex.first < 7 && tileIndex.second >= 0 && tileIndex.second < 7
            && holeIsOnBoard(tileIndex.first, tileIndex.second);
   }
 
   void HandleMoveMade(){
-    if( isCalculating ){
-      calculationCancelled = true;
-    }
-    isCalculating = true;
-    newCalculationRequired.notify_one();
+    canStillWin = checkPosition(encodeerBord());
   }
 
   void reverseMove(){
