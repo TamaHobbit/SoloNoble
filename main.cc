@@ -11,6 +11,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
 #include <cassert>
+#include <fstream>
 using namespace std;
 
 const char open = 'O';
@@ -26,15 +27,45 @@ char gaten[7][7];
 #include "TwoClickOrDrag.h"
 #include "SDLscherm.h"
 
+/*
 int main(){
+	basic_ifstream<bordKengetal> dataFile("solutions.bin", ios::in | ios::binary);
+	vector<bordKengetal> allSolutions;
+	bordKengetal currentNumber;
+	while( dataFile.good() ){
+		dataFile.read(&currentNumber,1);
+		allSolutions.push_back(currentNumber);
+		cout << currentNumber << endl;
+	}
+	cout << allSolutions.size() << endl;
+}
+*/
+
+int main(){
+  basic_ofstream<char*> dataFile("solutions.bin", ios::out | ios::binary);
 
   beginSituatie();
+  bordKengetal current = 105976010262080;//encodeerBord();
+  uint64_t totalSolutions = 0;
+  stellingTeReddenBlocking(current, totalSolutions);
 
-  bordKengetal current = encodeerBord();
-  cout << "Calculating..." << endl;
-  findAllSolvedPositions(current);
-  cout << "Done, " << alleKennis.size() << " positions checked" << endl;
-  
+  cout << "Done, " << totalSolutions << " solutions" << endl;
+  vector<bordKengetal> allSolutions;
+  allSolutions.reserve(totalSolutions);
+
+  for(auto kvp : alleKennis){
+  	if( kvp.second ){
+  		allSolutions.push_back(kvp.first);
+  	}
+  }
+  assert(allSolutions.size() == totalSolutions);
+
+  dataFile.write(reinterpret_cast<char*>(&allSolutions[0]), allSolutions.size() * sizeof(allSolutions[0]));
+  dataFile.close();
+  //for(auto s : allSolutions){
+  //	cout << s << endl;
+  //}
 
   return 0;
 }
+

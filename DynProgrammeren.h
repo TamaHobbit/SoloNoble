@@ -72,7 +72,7 @@ void stellingTeRedden(bordKengetal encodedBoard, std::atomic<bool> & result, std
 }
 
 // same as above, but not async; cannot be cancelled midway
-bool stellingTeReddenBlocking(bordKengetal encodedBoard){
+bool stellingTeReddenBlocking(bordKengetal encodedBoard, uint64_t & totalSolutions){
   // kijk of we hem al hebben gezien
   map<bordKengetal, bool>::const_iterator alBekend = alleKennis.find ( encodedBoard );
   if( alBekend != alleKennis.end() ){
@@ -82,15 +82,17 @@ bool stellingTeReddenBlocking(bordKengetal encodedBoard){
   // oplossing gevonden
   if( gewonnen(encodedBoard) ){
     alleKennis[ encodedBoard ] = true;
+    ++totalSolutions;
     return true;
   }
 
   // probeer alle zetten in de huidige opstelling
-  if( doeVoorMogelijkeZetten(encodedBoard, [encodedBoard] (int x, int y, int toX, int toY){
+  if( doeVoorMogelijkeZetten(encodedBoard, [encodedBoard, &totalSolutions] (int x, int y, int toX, int toY){
     bordKengetal nextState = doeZet( encodedBoard, x, y, toX, toY );
-    return stellingTeReddenBlocking(nextState);
+    return stellingTeReddenBlocking(nextState, totalSolutions);
   }) ){
     alleKennis[ encodedBoard ] = true;
+    ++totalSolutions;
     return true;
   }
 
