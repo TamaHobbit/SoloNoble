@@ -28,20 +28,24 @@ char gaten[7][7];
 #include "SDLscherm.h"
 
 /*
+
 int main(){
 	basic_ifstream<char> dataFile("solutions.bin", ios::in | ios::binary);
 	vector<bordKengetal> allSolutions;
+  allSolutions.reserve(3357032);
 	bordKengetal currentNumber;
 
   // Dahl loop, or N-and-a-half loop
   for( ; dataFile.read(reinterpret_cast<char*>(&currentNumber),8), dataFile.good(); ){
     allSolutions.push_back(currentNumber);
-    cout << currentNumber << endl;
+    //cout << currentNumber << endl;
   }
 
-	cout << allSolutions.size() << endl;
+  dataFile.close();
 }
+
 */
+///*
 
 int main() {
   basic_ofstream<char> dataFile("solutions.bin", ios::out | ios::binary);
@@ -62,6 +66,8 @@ int main() {
   }
   assert(allSolutions.size() == totalSolutions);
 
+  sort(allSolutions.begin(),allSolutions.end());
+
   const size_t solutionBytes = allSolutions.size() * sizeof(allSolutions[0]);
   if( !dataFile.write(reinterpret_cast<char*>(&allSolutions[0]), solutionBytes) ){
     cout << "Writing to file failed" << endl;
@@ -75,3 +81,4 @@ int main() {
   return 0;
 }
 
+//*/
