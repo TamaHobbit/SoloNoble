@@ -47,9 +47,9 @@ int main() {
   basic_ofstream<char> dataFile("solutions.bin", ios::out | ios::binary);
 
   beginSituatie();
-  bordKengetal current = 105976010262080;//encodeerBord();
+  bordKengetal current = encodeerBord();
   uint64_t totalSolutions = 0;
-  stellingTeReddenBlocking(current, totalSolutions);
+  findAllSolvedPositions(current, totalSolutions);
 
   cout << "Done, " << totalSolutions << " solutions" << endl;
   vector<bordKengetal> allSolutions;
@@ -68,9 +68,9 @@ int main() {
   }
   
   dataFile.close();
-  for(auto s : allSolutions){
-   	cout << s << endl;
-  }
+  // for(auto s : allSolutions){
+  //  	cout << s << endl;
+  // }
 
   return 0;
 }

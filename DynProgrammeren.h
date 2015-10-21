@@ -129,7 +129,7 @@ bool doeVoorMogelijkeZettenExhaustive(bordKengetal state, std::function<bool(int
 }
 
 // same as above, but don't stop and return until you find every solution under the given position
-bool findAllSolvedPositions(bordKengetal encodedBoard){
+bool findAllSolvedPositions(bordKengetal encodedBoard, uint64_t & totalSolutions){
   // kijk of we hem al hebben gezien - nog steeds; want dit kom alleen voor bij symmetrieen,
   // dus als dit eenmaal het geval is heeft het geen zin om verder te zoeken want 
   // alle suboplossingen zijn bij de eerste symmetrie al gevonden
@@ -141,15 +141,17 @@ bool findAllSolvedPositions(bordKengetal encodedBoard){
   // oplossing gevonden
   if( gewonnen(encodedBoard) ){
     alleKennis[ encodedBoard ] = true;
+    ++totalSolutions;
     return true;
   }
 
   // probeer alle zetten in de huidige opstelling
-  if( doeVoorMogelijkeZettenExhaustive(encodedBoard, [encodedBoard] (int x, int y, int toX, int toY){
+  if( doeVoorMogelijkeZettenExhaustive(encodedBoard, [encodedBoard, &totalSolutions] (int x, int y, int toX, int toY){
     bordKengetal nextState = doeZet( encodedBoard, x, y, toX, toY );
-    return findAllSolvedPositions(nextState);
+    return findAllSolvedPositions(nextState, totalSolutions);
   }) ){
     alleKennis[ encodedBoard ] = true;
+    ++totalSolutions;
     return true;
   }
 
