@@ -1,3 +1,7 @@
-all:
-	g++ -std=c++11 main.cc -Wall -Wfatal-errors -o knikkers `sdl2-config --cflags --libs` -lSDL2_image -pthread
+FLAGS=-std=c++1z -Wall -Wfatal-errors `sdl2-config --cflags --libs` -lSDL2_image -pthread
 
+solonoble: main.cc *.h
+	clang++ $(FLAGS) main.cc -o $@
+
+solonoble.html:
+	em++ $(FLAGS) main.cc -o $@
